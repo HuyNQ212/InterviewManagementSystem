@@ -1,6 +1,8 @@
 using DataAccess.Models;
 using DataAccess.Repositories;
 using DataAccess.Repositories.Implement;
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.Data.SqlClient;
 
 namespace InterviewManagementSystem.MVC
 {
@@ -33,9 +35,22 @@ namespace InterviewManagementSystem.MVC
 
             app.UseAuthorization();
 
+            //app.MapControllerRoute(
+            //    name: "candidate-name",
+            //    pattern: "{candidateName}",
+            //    defaults: new {controller = "Candidates", action = "Details"});
+
+
+
+            //app.MapControllerRoute(
+            //    name: "detail-candidate",
+            //    pattern: "{controller=Candidates}/{action=Details}/{id}");
+
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
             app.Run();
         }
