@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
+﻿using System.ComponentModel;
 
 namespace DataAccess.Models;
 
@@ -42,5 +38,9 @@ public partial class Candidate : BaseEntity
     public virtual User? Recruiter { get; set; }
 
     public virtual CandidateStatus? Status { get; set; }
+
+    public virtual Offer? Offer { get; set; }
+
+    public virtual Schedule? Schedule { get; set; }
 
 }

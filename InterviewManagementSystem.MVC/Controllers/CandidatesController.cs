@@ -1,5 +1,7 @@
-﻿using DataAccess.Models;
+﻿using AutoMapper;
+using DataAccess.Models;
 using DataAccess.Repositories;
+using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -8,73 +10,62 @@ namespace InterviewManagementSystem.MVC.Controllers
 {
     public class CandidatesController : Controller
     {
-        private readonly InterviewManagementContext _context;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public CandidatesController(InterviewManagementContext context, IUnitOfWork unitOfWork)
+        public CandidatesController(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _context = context;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        // GET: Candidates
         public IActionResult Index()
         {
-            var allCandidates = _unitOfWork.GetRepository<Candidate>().GetAll(includeProperties: "Recruiter,Status");
-            return View(allCandidates);
-        }
+            var allCandidates = _unitOfWork.GetRepository<Candidate>()
+                .GetAll(includeProperties: "Recruiter,Status");
 
-        // GET: Candidates/Details/5
-        public IActionResult Details(int? id)
-        {
-            if (id == null || _context.Candidates == null)
+            var indexCandidates = new List<CandidateViewModel>();
+
+            foreach (var candidate in allCandidates)
             {
-                return NotFound();
+                var indexCandidateMapped = _mapper.Map<CandidateViewModel>(candidate);
+                indexCandidates.Add(indexCandidateMapped);
             }
 
-            var candidate = _unitOfWork.GetRepository<Candidate>()
-                .GetAll(filter: x => x.Id == id, includeProperties: "Recruiter,Status");
-
-            if (candidate.Count() == 0)
-            {
-                return NotFound();
-            }
-
-            return View(candidate.ToList()[0]);
+            return View(indexCandidates);
         }
 
-        // GET: Candidates/Create
         public IActionResult Create()
         {
             ViewData["RecruiterId"] = new SelectList(_unitOfWork.GetRepository<User>().GetAll(), "Id", "FullName");
             ViewData["StatusId"] = new SelectList(_unitOfWork.GetRepository<CandidateStatus>().GetAll(), "Id", "StatusName");
+
             return View();
         }
 
-        // POST: Candidates/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Id,FullName,DateOfBirth,PhoneNumber,Email,Address,Gender,Cvattachment,StatusId,YearOfExperience,RecruiterId,Note,CreatedAt,UpdatedAt,IsActive")] Candidate candidate)
+        public IActionResult Create([Bind("FullName,DateOfBirth,PhoneNumber,Email,Address,Gender,StatusId,YearOfExperience,RecruiterId,Note")] CandidateViewModel candidateViewModel)
         {
             if (ModelState.IsValid)
             {
+                Candidate candidate = _mapper.Map<Candidate>(candidateViewModel);
                 _unitOfWork.GetRepository<Candidate>().Insert(candidate);
                 _unitOfWork.GetRepository<Candidate>().Save();
+                TempData["success"] = "Create new candidate successfully!";
+
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["RecruiterId"] = new SelectList(_unitOfWork.GetRepository<User>().GetAll(), "Id", "FullName", candidate.RecruiterId);
-            ViewData["StatusId"] = new SelectList(_unitOfWork.GetRepository<CandidateStatus>().GetAll(), "Id", "StatusName", candidate.StatusId);
+            ViewData["RecruiterId"] = new SelectList(_unitOfWork.GetRepository<User>().GetAll(), "Id", "FullName", candidateViewModel.RecruiterId);
+            ViewData["StatusId"] = new SelectList(_unitOfWork.GetRepository<CandidateStatus>().GetAll(), "Id", "StatusName", candidateViewModel.StatusId);
 
-            return View(candidate);
+            return View(candidateViewModel);
         }
 
-        // GET: Candidates/Edit/5
-        public  IActionResult Edit(int? id)
+        public IActionResult Edit(int? id)
         {
-            if (id == null || _context.Candidates == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -86,19 +77,19 @@ namespace InterviewManagementSystem.MVC.Controllers
                 return NotFound();
             }
 
-            ViewData["RecruiterId"] = new SelectList(_unitOfWork.GetRepository<User>().GetAll(), "Id", "FullName", candidate.RecruiterId);
-            ViewData["StatusId"] = new SelectList(_unitOfWork.GetRepository<CandidateStatus>().GetAll(), "Id", "StatusName", candidate.StatusId);
-            return View(candidate);
+            var candidateViewModel = _mapper.Map<CandidateViewModel>(candidate);
+
+            ViewData["RecruiterId"] = new SelectList(_unitOfWork.GetRepository<User>().GetAll(), "Id", "FullName", candidateViewModel.RecruiterId);
+            ViewData["StatusId"] = new SelectList(_unitOfWork.GetRepository<CandidateStatus>().GetAll(), "Id", "StatusName", candidateViewModel.StatusId);
+
+            return View(candidateViewModel);
         }
 
-        // POST: Candidates/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, [Bind("Id,FullName,DateOfBirth,PhoneNumber,Email,Address,Gender,Cvattachment,StatusId,YearOfExperience,RecruiterId,Note")] Candidate candidate)
+        public IActionResult Edit(int id, [Bind("Id,FullName,DateOfBirth,PhoneNumber,Email,Address,Gender,StatusId,YearOfExperience,RecruiterId,Note")] CandidateViewModel candidateViewModel)
         {
-            if (id != candidate.Id)
+            if (id != candidateViewModel.Id)
             {
                 return NotFound();
             }
@@ -107,12 +98,15 @@ namespace InterviewManagementSystem.MVC.Controllers
             {
                 try
                 {
+                    Candidate candidate = _mapper.Map<Candidate>(candidateViewModel);
                     _unitOfWork.GetRepository<Candidate>().Update(candidate);
                     _unitOfWork.GetRepository<Candidate>().Save();
+                    TempData["success"] = "Edit candidate successfully!";
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CandidateExists(candidate.Id))
+                    if (!CandidateExists(candidateViewModel.Id))
                     {
                         return NotFound();
                     }
@@ -124,46 +118,31 @@ namespace InterviewManagementSystem.MVC.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["RecruiterId"] = new SelectList(_unitOfWork.GetRepository<User>().GetAll(), "Id", "FullName", candidate.RecruiterId);
-            ViewData["StatusId"] = new SelectList(_unitOfWork.GetRepository<CandidateStatus>().GetAll(), "Id", "StatusName", candidate.StatusId);
-            return View(candidate);
+            ViewData["RecruiterId"] = new SelectList(_unitOfWork.GetRepository<User>().GetAll(), "Id", "FullName", candidateViewModel.RecruiterId);
+            ViewData["StatusId"] = new SelectList(_unitOfWork.GetRepository<CandidateStatus>().GetAll(), "Id", "StatusName", candidateViewModel.StatusId);
+
+            return View(candidateViewModel);
         }
 
-        // GET: Candidates/Delete/5
-        public IActionResult Delete(int? id)
-        {
-            if (id == null || _context.Candidates == null)
-            {
-                return NotFound();
-            }
-
-            var candidate = _unitOfWork.GetRepository<Candidate>()
-                .GetAll(filter: x => x.Id == id, includeProperties: "Recruiter,Status");
-
-            if (candidate.Count() == 0)
-            {
-                return NotFound();
-            }
-
-            return View(candidate.ToList()[0]);
-        }
-
-        // POST: Candidates/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            if (_context.Candidates == null)
-            {
-                return Problem("Entity set 'InterviewManagementContext.Candidates'  is null.");
-            }
 
-            var candidate = _unitOfWork.GetRepository<Candidate>().GetById(id);
+            var candidate = _unitOfWork.GetRepository<Candidate>().FirstOrDefaultInclude(c => c.Id == id, "Offer", "Schedule");
 
             if (candidate != null)
             {
                 _unitOfWork.GetRepository<Candidate>().Delete(candidate);
-                _unitOfWork.GetRepository<Candidate>().Save();
+                _unitOfWork.GetRepository<Offer>().Delete(candidate.Offer?.Id);
+                _unitOfWork.GetRepository<Schedule>().Delete(candidate.Schedule?.Id);
+                _unitOfWork.SaveChanges();
+                TempData["success"] = "Delete candidate successfully!";
+
+            }
+            else
+            {
+                TempData["error"] = "Delete candidate failed!";
             }
 
             return RedirectToAction(nameof(Index));

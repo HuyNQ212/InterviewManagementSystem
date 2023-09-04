@@ -1,0 +1,87 @@
+﻿@model IEnumerable<DataAccess.Models.Offer>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Offers list</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-outline-dark">Create New</a>
+</p>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ContractType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OfferStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DueDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BaseSalary)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BonusRate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ApprovedByManager)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Department)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Position)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Candidate)
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ContractType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OfferStatus)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DueDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BaseSalary)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BonusRate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ApprovedByManager.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Department.DepartmentName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Position.PositionName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Candidate.FullName)
+                </td>
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-dark w-100">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-dark w-100">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-dark w-100">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

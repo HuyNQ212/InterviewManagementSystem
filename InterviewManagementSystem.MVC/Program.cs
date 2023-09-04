@@ -1,8 +1,7 @@
-using DataAccess.Models;
+﻿using DataAccess.Models;
 using DataAccess.Repositories;
 using DataAccess.Repositories.Implement;
-using Microsoft.AspNetCore.Rewrite;
-using Microsoft.Data.SqlClient;
+using InterviewManagementSystem.MVC.Models;
 
 namespace InterviewManagementSystem.MVC
 {
@@ -14,8 +13,12 @@ namespace InterviewManagementSystem.MVC
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
             builder.Services.AddScoped<InterviewManagementContext>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+            builder.Services.AddScoped<IOfferRepository, OfferRepository>();
 
 
             var app = builder.Build();
@@ -29,6 +32,7 @@ namespace InterviewManagementSystem.MVC
             }
 
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -51,6 +55,13 @@ namespace InterviewManagementSystem.MVC
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
+
+            app.Use(async (context, next) =>
+            {
+                // Các middleware ở trước invoke sẽ chạy khi request đến
+                await next.Invoke();
+                // Các middleware ở sau invoke sẽ chayk hi response được trả về
+            });
 
             app.Run();
         }

@@ -1,6 +1,7 @@
 ﻿using DataAccess.Models;
 using DataAccess.Repositories;
 using DataAccess.Repositories.Implement;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Presentation.ConsoleApp
@@ -157,14 +158,12 @@ namespace Presentation.ConsoleApp
 
         private void Run()
         {
-            var userRepository = unitOfWork.GetRepository<User>();
+            var user = dbContext.Set<User>().FromSqlRaw("Select * From Users").ToList();
 
-            var users = userRepository.GetAll(includeProperties: "Candidates");
-
-            foreach (var user in users)
+            user.ForEach(x =>
             {
-                Console.WriteLine(user.FullName);
-            }
+                Console.WriteLine(x.FullName);
+            });
             //departments1.ForEach(department =>
             //{
             //    department.Users.ToList().ForEach(user =>

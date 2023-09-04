@@ -12,6 +12,8 @@ public partial class Offer : BaseEntity
 
     public int DepartmentId { get; set; }
 
+    public int? CandidateId { get; set; }
+
     public string? OfferStatus { get; set; }
 
     public DateTime? DueDate { get; set; }
@@ -29,5 +31,7 @@ public partial class Offer : BaseEntity
     public virtual Department Department { get; set; } = null!;
 
     public virtual Position Position { get; set; } = null!;
+
+    public virtual Candidate? Candidate { get; set; } = null!;
 
 }

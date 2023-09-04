@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json;
-
-namespace DataAccess.Models;
+﻿namespace DataAccess.Models;
 
 public partial class Schedule : BaseEntity
 {
@@ -21,6 +17,10 @@ public partial class Schedule : BaseEntity
     public string? Note { get; set; }
 
     public string? Result { get; set; }
+
+    public int? CandidateId { get; set; }
+
+    public virtual Candidate? Candidate { get; set; } = null!;
 
     public virtual ICollection<InterviewerSchedule> InterviewerSchedules { get; set; } = new List<InterviewerSchedule>();
 

@@ -1,0 +1,79 @@
+﻿@model IEnumerable<DataAccess.Models.Schedule>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p class="text-end">
+    <a asp-action="Create" class="btn btn-outline-dark">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InterviewTimeStart)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InterviewTimeEnd)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Location)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MeetingId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Note)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Result)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Candidate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InterviewTimeStart)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InterviewTimeEnd)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Location)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MeetingId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Note)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Result)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Candidate.FullName)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn-outline-dark w-100 btn">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn-outline-dark w-100 btn">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn-outline-dark w-100 btn">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

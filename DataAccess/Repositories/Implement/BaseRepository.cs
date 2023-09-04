@@ -15,7 +15,7 @@ namespace DataAccess.Repositories.Implement
             dbSet = context.Set<T>();
         }
 
-        public virtual bool Delete(object id)
+        public virtual void Delete(object? id)
         {
             T? entityToDelete = dbSet.Find(id);
 
@@ -24,10 +24,7 @@ namespace DataAccess.Repositories.Implement
                 entityToDelete.IsActive = false;
                 entityToDelete.UpdatedAt = DateTime.Now;
                 context.Entry(entityToDelete).State = EntityState.Modified;
-                return true;
             }
-
-            return false;
         }
 
         public virtual T? GetById(object id)
@@ -56,24 +53,22 @@ namespace DataAccess.Repositories.Implement
             context.Entry(entity).State = EntityState.Modified;
         }
 
-        public virtual bool Delete(T entity)
+        public virtual void Delete(T entity)
         {
             if (context.Entry(entity).State == EntityState.Detached)
             {
                 dbSet.Attach(entity);
-                return false;
             }
 
             entity.IsActive = false;
             entity.UpdatedAt = DateTime.Now;
 
             context.Entry(entity).State = EntityState.Modified;
-            return true;
         }
 
         public virtual IEnumerable<T> GetAll(
-            Expression<Func<T, bool>> filter = null,
-            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+            Expression<Func<T, bool>>? filter = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
             string includeProperties = "")
         {
             IQueryable<T> query = dbSet.Where(t => t.IsActive == true);
@@ -110,6 +105,25 @@ namespace DataAccess.Repositories.Implement
         public virtual void Save()
         {
             context.SaveChanges();
+        }
+
+        public T? FirstOrDefault(Expression<Func<T, bool>> filter)
+        {
+            return dbSet.Where(t => t.IsActive == true).FirstOrDefault(filter);
+        }
+
+        public virtual T? FirstOrDefaultInclude(Expression<Func<T, bool>> filter, params string[] includeProps)
+        {
+            var query = dbSet.AsQueryable();
+            if (includeProps.Length > 0)
+            {
+                foreach (var prop in includeProps)
+                {
+                    query = query.Include(prop);
+                }
+            }
+
+            return query.FirstOrDefault(filter);
         }
     }
 }

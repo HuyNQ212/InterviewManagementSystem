@@ -4,6 +4,7 @@ using DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(InterviewManagementContext))]
-    partial class InterviewManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20230829030955_AddCandidateToOffer")]
+    partial class AddCandidateToOffer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -428,9 +431,6 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CandidateId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -467,10 +467,6 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id")
                         .HasName("PK__Schedule__3214EC07646F1A23");
-
-                    b.HasIndex("CandidateId")
-                        .IsUnique()
-                        .HasFilter("[CandidateId] IS NOT NULL");
 
                     b.ToTable("Schedules");
                 });
@@ -676,15 +672,6 @@ namespace DataAccess.Migrations
                     b.Navigation("Position");
                 });
 
-            modelBuilder.Entity("DataAccess.Models.Schedule", b =>
-                {
-                    b.HasOne("DataAccess.Models.Candidate", "Candidate")
-                        .WithOne("Schedule")
-                        .HasForeignKey("DataAccess.Models.Schedule", "CandidateId");
-
-                    b.Navigation("Candidate");
-                });
-
             modelBuilder.Entity("DataAccess.Models.User", b =>
                 {
                     b.HasOne("DataAccess.Models.Department", "Department")
@@ -709,8 +696,6 @@ namespace DataAccess.Migrations
                     b.Navigation("CandidateSkills");
 
                     b.Navigation("Offer");
-
-                    b.Navigation("Schedule");
                 });
 
             modelBuilder.Entity("DataAccess.Models.CandidateStatus", b =>
