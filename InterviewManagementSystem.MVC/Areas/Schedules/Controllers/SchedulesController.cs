@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace InterviewManagementSystem.MVC.Controllers
+namespace InterviewManagementSystem.MVC.Areas.Schedules.Controllers
 {
+    [Area("Schedules")]
     public class SchedulesController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -120,7 +121,7 @@ namespace InterviewManagementSystem.MVC.Controllers
             return View(schedule);
         }
 
-  
+
         public IActionResult Delete(int? id)
         {
             if (id == null)

@@ -27,4 +27,9 @@
 		<ProjectReference Include="..\DataAccess\DataAccess.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Folder Include="Areas\Schedules\Data\" />
+		<Folder Include="Areas\Schedules\Models\" />
+	</ItemGroup>
+
 </Project>

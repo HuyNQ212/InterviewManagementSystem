@@ -51,6 +51,14 @@ namespace InterviewManagementSystem.MVC
             //    pattern: "{controller=Candidates}/{action=Details}/{id}");
 
 
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                  name: "areas",
+                  pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+                );
+            });
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -62,6 +70,8 @@ namespace InterviewManagementSystem.MVC
                 await next.Invoke();
                 // Các middleware ở sau invoke sẽ chayk hi response được trả về
             });
+
+
 
             app.Run();
         }
